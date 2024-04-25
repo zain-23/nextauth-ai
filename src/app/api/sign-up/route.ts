@@ -30,7 +30,23 @@ export const POST = async (request: Request) => {
     const verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
 
     if (existingUserByEmail) {
-      true;
+      if (existingUserByEmail.isVerified) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "User already exist with this email",
+          },
+          {
+            status: 400,
+          }
+        );
+      } else {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        existingUserByEmail.password = hashedPassword;
+        existingUserByEmail.verifyCode = verifyCode;
+        existingUserByEmail.verifyCodeExpiry = new Date(Date.now() + 3600000);
+        await existingUserByEmail.save();
+      }
     } else {
       const hashedPassword = await bcrypt.hash(password, 10);
       const expiryDate = new Date();
@@ -58,13 +74,23 @@ export const POST = async (request: Request) => {
       return NextResponse.json(
         {
           success: false,
-          message: "Failed to send verification",
+          message: emailResponse.message,
         },
         {
           status: 500,
         }
       );
     }
+
+    return NextResponse.json(
+      {
+        success: true,
+        message: "User registered successfully. Please verify your email",
+      },
+      {
+        status: 201,
+      }
+    );
   } catch (error) {
     console.log(`Error registering user ${error}`);
     return NextResponse.json(
