@@ -4,7 +4,7 @@ import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 
-const authOptions: NextAuthOptions = {
+export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       id: "credentials",
@@ -43,7 +43,7 @@ const authOptions: NextAuthOptions = {
           );
 
           if (isPasswordValid) {
-            return null;
+            return user;
           } else {
             throw new Error("Incorrect Password");
           }
@@ -57,18 +57,18 @@ const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token._id = user._id?.toString();
-        token.isAccepting = user.isAcceptingMessages;
-        token.username = user.username;
         token.isVerified = user.isVerified;
+        token.isAcceptingMessages = user.isAcceptingMessages;
+        token.username = user.username;
       }
       return token;
     },
     async session({ session, token }) {
       if (token) {
-        session.user._id = token._id?.toString();
+        session.user._id = token._id;
+        session.user.isVerified = token.isVerified;
         session.user.isAcceptingMessages = token.isAcceptingMessages;
         session.user.username = token.username;
-        session.user.isVerified = token.isVerified;
       }
       return session;
     },
