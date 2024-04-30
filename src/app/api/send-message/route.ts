@@ -27,7 +27,7 @@ export const POST = async (request: Request) => {
       return NextResponse.json(
         {
           success: false,
-          messages: "User is accepting messages",
+          messages: "User not accepting messages",
         },
         {
           status: 403,
