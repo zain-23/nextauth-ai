@@ -2,12 +2,11 @@ import { connectDB } from "@/lib/dbConnect";
 import UserModel from "@/model/User";
 import { NextResponse } from "next/server";
 
-export const GET = async (request: Request) => {
+export const POST = async (request: Request) => {
   await connectDB();
   try {
     const { username, code } = await request.json();
     const decodedUsername = decodeURIComponent(username);
-
     const user = await UserModel.findOne({ username: decodedUsername });
 
     if (!user) {
@@ -51,7 +50,7 @@ export const GET = async (request: Request) => {
       return NextResponse.json(
         {
           success: false,
-          message: "Error verify user",
+          message: "Incorrect verification code",
         },
         {
           status: 400,
