@@ -1,5 +1,5 @@
 import { getServerSession } from "next-auth";
-import { authOptions } from "../sign-up/[...nextauth]/options";
+import { authOptions } from "../auth/[...nextauth]/options";
 import UserModel from "@/model/User";
 import { connectDB } from "@/lib/dbConnect";
 import { User } from "next-auth";
