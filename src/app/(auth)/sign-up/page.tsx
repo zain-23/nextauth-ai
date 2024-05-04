@@ -1,15 +1,12 @@
 "use client";
-import { useToast } from "@/components/ui/use-toast";
 import { signUpSchema } from "@/schemas/signUpSchema";
 import { ApiResponse } from "@/types/ApiResponse";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import axios, { AxiosError } from "axios";
-import { ToastAction } from "@/components/ui/toast";
 import {
   Card,
   CardContent,
@@ -21,7 +18,6 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -31,9 +27,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader } from "lucide-react";
 import { useDebounce } from "@/helpers/useDebounceValue";
+import { toast } from "sonner";
 
 const Page = () => {
-  const { toast } = useToast();
   const router = useRouter();
   const [isCheckingUsername, setIsCheckingUsername] = useState<boolean>(false);
   const [usernameMessage, setUsernameMessage] = useState<string>("");
@@ -59,8 +55,7 @@ const Page = () => {
             `/api/check-username-unique?username=${debounceUsename}`
           );
           setUsernameMessage(response.data.message);
-          toast({
-            title: "Username is available",
+          toast.success("Username is available", {
             description: usernameMessage,
           });
         } catch (error) {
@@ -69,10 +64,8 @@ const Page = () => {
             axiosError.response?.data.message ??
               "Error checking username try again"
           );
-          toast({
-            title: "Username must be unique",
+          toast.error("Username must be unique", {
             description: usernameMessage,
-            variant: "destructive",
           });
         } finally {
           setIsCheckingUsername(false);
@@ -85,20 +78,15 @@ const Page = () => {
   const onSubmit = async (data: z.infer<typeof signUpSchema>) => {
     try {
       const response = await axios.post<ApiResponse>("/api/sign-up", data);
-      toast({
-        title: "Success",
-        variant: "default",
+      toast.success("Sign up successfully", {
         description: response.data.message,
       });
       router.replace(`/verify/${data.username}`);
     } catch (error) {
       console.error(`Error is signup ${error}`);
       const axiosError = error as AxiosError<ApiResponse>;
-      toast({
-        title: "Sign failed",
-        variant: "destructive",
-        description: axiosError.response?.data.message,
-        action: <ToastAction altText="Try again">Try again</ToastAction>,
+      toast.error("Sign up failed", {
+        description: axiosError.message,
       });
     }
   };

@@ -5,13 +5,12 @@ import {
   InputOTPSeparator,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { ToastAction } from "@/components/ui/toast";
-import { toast } from "@/components/ui/use-toast";
 import { ApiResponse } from "@/types/ApiResponse";
 import axios, { AxiosError } from "axios";
 import { useState } from "react";
 import { Loader } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 const Page = ({ params }: { params: { username: string } }) => {
   const [verifyCode, setVerifyCode] = useState<string | null>(null);
@@ -25,19 +24,15 @@ const Page = ({ params }: { params: { username: string } }) => {
         username: params.username,
         code: verifyCode,
       });
-      toast({
-        title: "Verify Successfully",
-        description: response?.data.message,
+      toast.success("Verify Successfully", {
+        description: response.data.message,
       });
-      router.replace("/");
+      router.replace("/sign-in");
     } catch (error) {
       console.log("Error in verify user");
       const axiosError = error as AxiosError<ApiResponse>;
-      toast({
-        title: "Verify failed",
-        variant: "destructive",
-        description: axiosError.response?.data.message,
-        action: <ToastAction altText="Try again">Try again</ToastAction>,
+      toast.error("Verify failed", {
+        description: axiosError.message,
       });
     } finally {
       setIsVerifying(false);
