@@ -6,7 +6,7 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-export const dynamic = "edge";
+export const runtime = "edge";
 
 export const POST = async (request: Request) => {
   try {
