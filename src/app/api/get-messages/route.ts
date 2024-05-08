@@ -54,7 +54,7 @@ export const GET = async (request: Request) => {
       return NextResponse.json(
         {
           success: false,
-          message: "User not found",
+          message: "Messages not found",
         },
         {
           status: 400,
